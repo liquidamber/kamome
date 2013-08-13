@@ -1,7 +1,14 @@
 name:              kamome
 version:           0.0.0
+synopsis:          This package provides graph-based accounting application with yesod.
 cabal-version:     >= 1.8
 build-type:        Simple
+homepage:          https://github.com/liquidamber/kamome/
+license:           GPL-3
+license-file:      LICENSE
+author:            Katsuaki Ikegami
+maintainer:        liquid.amber.ja@gmail.com
+category:          Web
 
 Flag dev
     Description:   Turn on development settings, like auto-reload templates.
