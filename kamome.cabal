@@ -16,6 +16,7 @@ library
                      Foundation
                      Import
                      Model
+                     ModelHelper
                      Settings
                      Settings.StaticFiles
                      Settings.Development
@@ -70,6 +71,7 @@ library
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
                  , fast-logger                   >= 0.3
+                 , time
 
 executable         kamome
     if flag(library-only)
