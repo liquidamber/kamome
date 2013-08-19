@@ -1,5 +1,10 @@
 language: haskell
+before_install:
+    cabal install cabal-dev
 install:
-    cabal install --enable-tests -flibrary-only
+    cabal-dev install -j --enable-tests -flibrary-only
 after_install:
-    cabal build
+    cabal-dev configure --enable-tests
+    cabal-dev build
+script:
+    cabal-dev test
