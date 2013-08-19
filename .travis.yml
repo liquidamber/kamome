@@ -2,9 +2,8 @@ language: haskell
 before_install:
     cabal install cabal-dev
 install:
-    cabal-dev install --enable-tests --only-dependencies -flibrary-only
+    cabal-dev install --flags "library-only" --enable-tests --only-dependencies
 after_install:
-    cabal-dev configure --enable-tests
-    cabal-dev build
+    cabal-dev configure --enable-tests && cabal-dev build
 script:
     cabal-dev test
