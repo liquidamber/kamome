@@ -24,7 +24,7 @@ executable kamome
   other-modules:       Kamome.Model
                      , Kamome.Model.Types
   -- other-extensions:    
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.7 && <4.9
                      , text
                      , time
                      , persistent >=2.1
