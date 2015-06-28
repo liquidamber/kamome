@@ -1,7 +1,8 @@
+{-# LANGUAGE OverloadedStrings          #-}
+
 module
   Kamome.Model.Types
   ( MoneyNodeType(..)
-  , PaymentStatus(..)
   )
   where
 
@@ -9,6 +10,8 @@ import Database.Persist.Class (PersistField, toPersistValue, fromPersistValue)
 import Database.Persist.Sql (PersistFieldSql, sqlType)
 import Database.Persist.Types (PersistValue(..), SqlType(..))
 import qualified Data.Text as T
+import qualified Data.ByteString as BS
+import qualified Data.Word8 as W8
 
 -- | Kind of money node.
 data MoneyNodeType
@@ -16,12 +19,6 @@ data MoneyNodeType
   | Liability -- ^ 負債
   | Revenue -- ^ 収益
   | Expense -- ^ 費用
-  deriving (Show, Enum, Eq, Bounded)
-
--- | Status of payment.
-data PaymentStatus
-  = Fixed -- ^ Already fixed.
-  | ToBeChecked -- ^ Not fixed and should be checked later.
   deriving (Show, Enum, Eq, Bounded)
 
 -- |
@@ -46,16 +43,18 @@ enumFromPersistValue :: (Bounded a, Enum a) => PersistValue -> Either T.Text a
 enumFromPersistValue = enumFromPersistValueBetween minBound maxBound
 
 instance PersistField MoneyNodeType where
-  toPersistValue = PersistInt64 . fromIntegral . fromEnum
-  fromPersistValue = enumFromPersistValue
+  toPersistValue = PersistByteString . BS.singleton . toChar
+    where
+      toChar Asset = W8._A
+      toChar Liability = W8._L
+      toChar Revenue = W8._R
+      toChar Expense = W8._E
+  fromPersistValue x = case x of
+    PersistByteString "A" -> Right Asset
+    PersistByteString "L" -> Right Liability
+    PersistByteString "R" -> Right Revenue
+    PersistByteString "E" -> Right Expense
+    _ -> Left $ T.pack $ "Unexpected MoneyNodeType: " ++ show x
 
 instance PersistFieldSql MoneyNodeType where
-  sqlType _ = SqlInt32
-
-instance PersistField PaymentStatus where
-  toPersistValue = PersistInt64 . fromIntegral . fromEnum
-  fromPersistValue = enumFromPersistValue
-
-instance PersistFieldSql PaymentStatus where
-  sqlType _ = SqlInt32
-
+  sqlType _ = SqlString

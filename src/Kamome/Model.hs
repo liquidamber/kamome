@@ -14,13 +14,17 @@ module
   , AccountClosingId
   , MoneyNode(..)
   , MoneyNodeId
-  , Payment(..)
-  , PaymentId
+  , Balance(..)
+  , BalanceId
+  , Budget(..)
+  , BudgetId
+  , Transaction(..)
+  , TransactionId
   , migrateAll
   )
   where
 
-import Data.Time (UTCTime)
+import Data.Time (Day, UTCTime)
 import Data.Text (Text)
 import Database.Persist.TH
 import Kamome.Model.Types
@@ -38,23 +42,38 @@ import Kamome.Model.Types
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 AccountClosing
-  deadline UTCTime
-  budget Int
+  deadline Day
+  created UTCTime default=CURRENT_TIME
+  UniqueDeadline deadline
   deriving Show
 
 MoneyNode
-  label Text
-  nodeType MoneyNodeType
-  UniqueLabel label
+  nodeType MoneyNodeType -- 種別
+  slug Text -- 一意なアルファベットID
+  description Text -- 説明文
+  created UTCTime default=CURRENT_TIME
+  UniqueSlug slug
   deriving Show
 
-Payment
-  label Text
-  value Int
-  status PaymentStatus
+Balance -- 残高
+  node MoneyNode -- ノード
+  balance Int -- 残高の値
+  date Day -- 日付
+  created UTCTime default=CURRENT_TIME
+  UniqueNodeDate node date
+
+Budget -- 予算
+  node MoneyNode
+  budget Int
+  end AccountClosing
+  created UTCTime default=CURRENT_TIME
+  UniqueBudget node end
+
+Transaction -- 取引
+  value Int -- 資金
   credit MoneyNode -- お金の出処
   debit MoneyNode -- お金の行先
+  date Day -- 決済日
   created UTCTime default=CURRENT_TIME
-  payed UTCTime
   deriving Show
 |]
